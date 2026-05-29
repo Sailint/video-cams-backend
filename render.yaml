@@ -1,0 +1,32 @@
+# Render Blueprint для backend магазина видеокамер.
+# В дашборде Render: New + → Blueprint → выбрать репозиторий video-cams-backend.
+# Render прочитает этот файл и создаст веб-сервис автоматически.
+services:
+  - type: web
+    name: video-cams-backend
+    runtime: node
+    region: frankfurt        # ближе к Neon (eu-central-1)
+    plan: free
+    branch: main
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_SSL
+        value: "true"
+      # Секреты задаются в дашборде (sync: false — не хранятся в репозитории)
+      - key: DB_HOST
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: JWT_SECRET
+        sync: false
