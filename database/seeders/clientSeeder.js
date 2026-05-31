@@ -90,8 +90,8 @@ const clientFactory = {
 const seed = async () => {
     const clients = [];
 
-    // Генерируем 50 клиентов
-    for (let i = 0; i < 50; i++) {
+    // Генерируем 100 клиентов
+    for (let i = 0; i < 100; i++) {
         clients.push(clientFactory.generate());
     }
 
@@ -116,11 +116,11 @@ const seed = async () => {
             ]);
 
             if ((i + 1) % 10 === 0) {
-                console.log(`   Добавлено ${i + 1} из 50 клиентов...`);
+                console.log(`   Добавлено ${i + 1} из 100 клиентов...`);
             }
         }
 
-        console.log('Успешно добавлено 50 клиентов в базу данных');
+        console.log('Успешно добавлено 100 клиентов в базу данных');
     } catch (error) {
         console.error('Ошибка при заполнении таблицы clients:', error.message);
         throw error;

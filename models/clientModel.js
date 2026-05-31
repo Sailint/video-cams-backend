@@ -1,7 +1,7 @@
 const pool = require('../config/db');
 
 const getAllClients = async () => {
-    const query = 'SELECT * FROM clients';
+    const query = 'SELECT * FROM clients ORDER BY id ASC';
     const result = await pool.query(query);
     return result.rows;
 };

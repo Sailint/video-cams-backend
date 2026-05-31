@@ -41,8 +41,8 @@ const cctvCameraFactory = {
     },
 
     getRandomPrice() {
-        // Цены от 5000 до 150000 рублей
-        return Math.floor(Math.random() * 145000 + 5000);
+        // Цены от 5000 до 200000 рублей
+        return Math.floor(Math.random() * 195000 + 5000);
     },
 
     getRandomBoolean(probability = 0.5) {
@@ -69,8 +69,8 @@ const seed = async () => {
     const cameras = [];
     const usedNames = new Set();
 
-    // Генерируем 50 уникальных камер видеонаблюдения
-    while (cameras.length < 50) {
+    // Генерируем 100 уникальных камер видеонаблюдения
+    while (cameras.length < 100) {
         const camera = cctvCameraFactory.generate();
 
         if (!usedNames.has(camera.name)) {
@@ -100,11 +100,11 @@ const seed = async () => {
             ]);
 
             if ((i + 1) % 10 === 0) {
-                console.log(`   Добавлено ${i + 1} из 50 камер...`);
+                console.log(`   Добавлено ${i + 1} из 100 камер...`);
             }
         }
 
-        console.log('Успешно добавлено 50 камер видеонаблюдения в базу данных');
+        console.log('Успешно добавлено 100 камер видеонаблюдения в базу данных');
     } catch (error) {
         console.error('Ошибка при заполнении таблицы cctv_cameras:', error.message);
         throw error;

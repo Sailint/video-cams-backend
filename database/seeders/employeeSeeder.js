@@ -93,8 +93,8 @@ const employeeFactory = {
 const seed = async () => {
     const employees = [];
 
-    // Генерируем 30 сотрудников
-    for (let i = 0; i < 30; i++) {
+    // Генерируем 100 сотрудников
+    for (let i = 0; i < 100; i++) {
         employees.push(employeeFactory.generate());
     }
 
@@ -121,11 +121,11 @@ const seed = async () => {
             ]);
 
             if ((i + 1) % 10 === 0) {
-                console.log(`   Добавлено ${i + 1} из 30 сотрудников...`);
+                console.log(`   Добавлено ${i + 1} из 100 сотрудников...`);
             }
         }
 
-        console.log('Успешно добавлено 30 сотрудников в базу данных');
+        console.log('Успешно добавлено 100 сотрудников в базу данных');
     } catch (error) {
         console.error('Ошибка при заполнении таблицы employees:', error.message);
         throw error;

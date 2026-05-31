@@ -11,6 +11,7 @@ const ordersMigration = require('./migrations/007_create_orders_table');
 const orderItemsMigration = require('./migrations/008_create_order_items_table');
 
 // Импортируем сидеры
+const userSeeder = require('./seeders/userSeeder');
 const cameraSeeder = require('./seeders/cameraSeeder');
 const cctvCameraSeeder = require('./seeders/cctvCameraSeeder');
 const employeeSeeder = require('./seeders/employeeSeeder');
@@ -53,6 +54,7 @@ const rollbackMigrations = async () => {
 const seedDatabase = async () => {
     console.log('\n🌱 Заполнение базы данных...\n');
 
+    await userSeeder.seed();
     await cameraSeeder.seed();
     await cctvCameraSeeder.seed();
     await employeeSeeder.seed();

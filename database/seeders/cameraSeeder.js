@@ -42,8 +42,8 @@ const cameraFactory = {
     },
 
     getRandomPrice() {
-        // Цены от 15000 до 1500000 рублей
-        return Math.floor(Math.random() * 1485000 + 15000);
+        // Цены от 15000 до 200000 рублей
+        return Math.floor(Math.random() * 185000 + 15000);
     },
 
     getRandomZoom() {

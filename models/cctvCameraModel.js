@@ -1,7 +1,7 @@
 const pool = require('../config/db');
 
 const getAllCctvCameras = async () => {
-    const query = 'SELECT * FROM cctv_cameras';
+    const query = 'SELECT * FROM cctv_cameras ORDER BY id ASC';
     const result = await pool.query(query);
     return result.rows;
 };
