@@ -1,9 +1,15 @@
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
+
+// Абсолютный путь к папке загрузок (backend/uploads), не зависящий от рабочей директории процесса.
+// На хостинге папки может не быть — создаём её при старте, иначе multer падает с ENOENT.
+const uploadDir = path.join(__dirname, '..', 'uploads');
+fs.mkdirSync(uploadDir, { recursive: true });
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'uploads/');
+        cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
         const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9);
