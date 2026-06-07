@@ -39,9 +39,13 @@ app.get('/', (req, res) => {
 app.use(notFound);
 app.use(errorHandler);
 
-app.listen(port, () => {
-    logger.info(`Сервер запущен на http://localhost:${port}`);
-});
+// На Vercel (serverless) постоянный сервер не запускается — приложение экспортируется
+// как обработчик. Локально (и на обычных хостингах вроде Render) слушаем порт как раньше.
+if (!process.env.VERCEL) {
+    app.listen(port, () => {
+        logger.info(`Сервер запущен на http://localhost:${port}`);
+    });
+}
 
 // Логирование необработанных ошибок процесса
 process.on('unhandledRejection', (reason) => {
@@ -51,3 +55,5 @@ process.on('unhandledRejection', (reason) => {
 process.on('uncaughtException', (err) => {
     logger.error('Необработанное исключение', { stack: err.stack });
 });
+
+module.exports = app;
