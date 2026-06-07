@@ -1,5 +1,4 @@
-const fs = require('fs');
-const path = require('path');
+const { uploadImage, deleteImage } = require('../config/cloudinary');
 const { getAllEmployees, getEmployeeById, createEmployee, updateEmployee, deleteEmployee } = require('../models/employeeModel');
 
 const getEmployees = async (req, res) => {
@@ -26,7 +25,8 @@ const addEmployee = async (req, res) => {
         const employeeData = { ...req.body };
 
         if (req.file) {
-            employeeData.photo_url = `/uploads/${req.file.filename}`;
+            const result = await uploadImage(req.file.buffer);
+            employeeData.photo_url = result.secure_url;
         }
 
         const newEmployee = await createEmployee(employeeData);
@@ -44,14 +44,12 @@ const editEmployee = async (req, res) => {
         const employeeData = { ...req.body };
 
         if (req.file) {
-            // Delete old photo if exists
-            if (oldEmployee.photo_url && oldEmployee.photo_url.startsWith('/uploads/')) {
-                const oldPath = path.join(__dirname, '..', oldEmployee.photo_url);
-                if (fs.existsSync(oldPath)) {
-                    fs.unlinkSync(oldPath);
-                }
+            // Удаляем старое фото из Cloudinary, если было
+            if (oldEmployee.photo_url) {
+                await deleteImage(oldEmployee.photo_url);
             }
-            employeeData.photo_url = `/uploads/${req.file.filename}`;
+            const result = await uploadImage(req.file.buffer);
+            employeeData.photo_url = result.secure_url;
         } else {
             // Keep existing photo if no new file uploaded
             employeeData.photo_url = oldEmployee.photo_url;
@@ -69,12 +67,9 @@ const removeEmployee = async (req, res) => {
         const employee = await getEmployeeById(req.params.id);
         if (!employee) return res.status(404).json({ message: 'Сотрудник не найден' });
 
-        // Delete photo file if exists
-        if (employee.photo_url && employee.photo_url.startsWith('/uploads/')) {
-            const photoPath = path.join(__dirname, '..', employee.photo_url);
-            if (fs.existsSync(photoPath)) {
-                fs.unlinkSync(photoPath);
-            }
+        // Удаляем фото из Cloudinary, если было
+        if (employee.photo_url) {
+            await deleteImage(employee.photo_url);
         }
 
         await deleteEmployee(req.params.id);

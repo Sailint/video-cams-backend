@@ -1,5 +1,4 @@
-const fs = require('fs');
-const path = require('path');
+const { uploadImage, deleteImage } = require('../config/cloudinary');
 const { getAllClients, getClientById, createClient, updateClient, deleteClient } = require('../models/clientModel');
 
 const getClients = async (req, res) => {
@@ -26,7 +25,8 @@ const addClient = async (req, res) => {
         const clientData = { ...req.body };
 
         if (req.file) {
-            clientData.photo_url = `/uploads/${req.file.filename}`;
+            const result = await uploadImage(req.file.buffer);
+            clientData.photo_url = result.secure_url;
         }
 
         const newClient = await createClient(clientData);
@@ -44,13 +44,11 @@ const editClient = async (req, res) => {
         const clientData = { ...req.body };
 
         if (req.file) {
-            if (oldClient.photo_url && oldClient.photo_url.startsWith('/uploads/')) {
-                const oldPath = path.join(__dirname, '..', oldClient.photo_url);
-                if (fs.existsSync(oldPath)) {
-                    fs.unlinkSync(oldPath);
-                }
+            if (oldClient.photo_url) {
+                await deleteImage(oldClient.photo_url);
             }
-            clientData.photo_url = `/uploads/${req.file.filename}`;
+            const result = await uploadImage(req.file.buffer);
+            clientData.photo_url = result.secure_url;
         } else {
             clientData.photo_url = oldClient.photo_url;
         }
@@ -67,11 +65,8 @@ const removeClient = async (req, res) => {
         const client = await getClientById(req.params.id);
         if (!client) return res.status(404).json({ message: 'Клиент не найден' });
 
-        if (client.photo_url && client.photo_url.startsWith('/uploads/')) {
-            const photoPath = path.join(__dirname, '..', client.photo_url);
-            if (fs.existsSync(photoPath)) {
-                fs.unlinkSync(photoPath);
-            }
+        if (client.photo_url) {
+            await deleteImage(client.photo_url);
         }
 
         await deleteClient(req.params.id);

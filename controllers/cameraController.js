@@ -1,5 +1,4 @@
-const fs = require('fs');
-const path = require('path');
+const { uploadImage, deleteImage } = require('../config/cloudinary');
 const { getAllCameras, getCameraById, createCamera, updateCamera, deleteCamera } = require('../models/cameraModel');
 
 const getCameras = async (req, res) => {
@@ -26,7 +25,8 @@ const addCamera = async (req, res) => {
         const cameraData = { ...req.body };
 
         if (req.file) {
-            cameraData.image_url = `/uploads/${req.file.filename}`;
+            const result = await uploadImage(req.file.buffer);
+            cameraData.image_url = result.secure_url;
         }
 
         const newCamera = await createCamera(cameraData);
@@ -44,14 +44,12 @@ const editCamera = async (req, res) => {
         const cameraData = { ...req.body };
 
         if (req.file) {
-            // Delete old image if exists
-            if (oldCamera.image_url && oldCamera.image_url.startsWith('/uploads/')) {
-                const oldPath = path.join(__dirname, '..', oldCamera.image_url);
-                if (fs.existsSync(oldPath)) {
-                    fs.unlinkSync(oldPath);
-                }
+            // Удаляем старое изображение из Cloudinary, если было
+            if (oldCamera.image_url) {
+                await deleteImage(oldCamera.image_url);
             }
-            cameraData.image_url = `/uploads/${req.file.filename}`;
+            const result = await uploadImage(req.file.buffer);
+            cameraData.image_url = result.secure_url;
         } else {
             // Keep existing image if no new file uploaded
             cameraData.image_url = oldCamera.image_url;
@@ -69,12 +67,9 @@ const removeCamera = async (req, res) => {
         const camera = await getCameraById(req.params.id);
         if (!camera) return res.status(404).json({ message: 'Камера не найдена' });
 
-        // Delete image file if exists
-        if (camera.image_url && camera.image_url.startsWith('/uploads/')) {
-            const imagePath = path.join(__dirname, '..', camera.image_url);
-            if (fs.existsSync(imagePath)) {
-                fs.unlinkSync(imagePath);
-            }
+        // Удаляем изображение из Cloudinary, если было
+        if (camera.image_url) {
+            await deleteImage(camera.image_url);
         }
 
         await deleteCamera(req.params.id);

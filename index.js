@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const dotenv = require('dotenv');
 const userRoutes = require('./routes/userRoutes');
 const cameraRoutes = require('./routes/cameraRoutes');
@@ -11,7 +10,7 @@ const cartRoutes = require('./routes/cartRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const logger = require('./config/logger');
 const httpLogger = require('./middleware/httpLogger');
-const { notFound, errorHandler } = require('./middleware/errorHandler');
+const { responseErrorLogger, notFound, errorHandler } = require('./middleware/errorHandler');
 
 dotenv.config();
 
@@ -21,7 +20,7 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 app.use(httpLogger);
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use(responseErrorLogger);
 
 // Подключение маршрутов
 app.use('/api/users', userRoutes);

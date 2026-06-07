@@ -1,21 +1,5 @@
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
-
-// Абсолютный путь к папке загрузок (backend/uploads), не зависящий от рабочей директории процесса.
-// На хостинге папки может не быть — создаём её при старте, иначе multer падает с ENOENT.
-const uploadDir = path.join(__dirname, '..', 'uploads');
-fs.mkdirSync(uploadDir, { recursive: true });
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-        const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, uniqueName + path.extname(file.originalname));
-    }
-});
 
 const fileFilter = (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|webp/;
@@ -29,8 +13,9 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
+// Файлы держим в памяти и отдаём в Cloudinary (см. config/cloudinary.js) — на диск ничего не пишем.
 const upload = multer({
-    storage,
+    storage: multer.memoryStorage(),
     fileFilter,
     limits: { fileSize: 5 * 1024 * 1024 } // 5MB
 });
