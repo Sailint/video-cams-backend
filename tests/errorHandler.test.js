@@ -10,7 +10,7 @@ const logger = require('../config/logger');
 const { notFound, errorHandler } = require('../middleware/errorHandler');
 
 const makeRes = () => {
-    const res = {};
+    const res = { locals: {} };
     res.status = jest.fn().mockReturnValue(res);
     res.json = jest.fn().mockReturnValue(res);
     return res;

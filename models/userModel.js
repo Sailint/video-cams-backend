@@ -16,7 +16,7 @@ const createUser = async (username, email, password, role = 'user') => {
         const result = await pool.query(query, values);
         return result.rows[0];
     } catch (err) {
-        if (err.code === '23505') { // Unique violation
+        if (err.code === '23505') {
             throw new Error('Пользователь с таким username или email уже существует');
         }
         throw err;

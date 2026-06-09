@@ -11,8 +11,6 @@ cloudinary.config({
 
 const FOLDER = 'video-cams-shop';
 
-// Загрузка файла из буфера (multer.memoryStorage) в Cloudinary.
-// Возвращает результат загрузки; нас интересует result.secure_url.
 const uploadImage = (buffer) =>
     new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
@@ -22,17 +20,12 @@ const uploadImage = (buffer) =>
         stream.end(buffer);
     });
 
-// Извлекает public_id из URL Cloudinary.
-// Пример: https://res.cloudinary.com/<cloud>/image/upload/v123/video-cams-shop/abc.jpg
-//   → video-cams-shop/abc
-// Для старых локальных путей вида /uploads/... вернёт null.
 const getPublicIdFromUrl = (url) => {
     if (!url) return null;
     const match = url.match(/\/upload\/(?:v\d+\/)?(.+)\.\w+$/);
     return match ? match[1] : null;
 };
 
-// Удаляет файл из Cloudinary, если это его URL. Иначе — ничего не делает.
 const deleteImage = async (url) => {
     const publicId = getPublicIdFromUrl(url);
     if (publicId) {

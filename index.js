@@ -8,6 +8,7 @@ const employeeRoutes = require('./routes/employeeRoutes');
 const clientRoutes = require('./routes/clientRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const orderRoutes = require('./routes/orderRoutes');
+const logRoutes = require('./routes/logRoutes');
 const logger = require('./config/logger');
 const httpLogger = require('./middleware/httpLogger');
 const { responseErrorLogger, notFound, errorHandler } = require('./middleware/errorHandler');
@@ -30,6 +31,7 @@ app.use('/api/employees', employeeRoutes);
 app.use('/api/clients', clientRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/logs', logRoutes);
 
 app.get('/', (req, res) => {
     res.send('Backend для магазина видеокамер работает!');

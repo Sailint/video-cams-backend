@@ -13,7 +13,7 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-// Файлы держим в памяти и отдаём в Cloudinary (см. config/cloudinary.js) — на диск ничего не пишем.
+// Файлы держим в памяти и отдаём в Cloudinary
 const upload = multer({
     storage: multer.memoryStorage(),
     fileFilter,

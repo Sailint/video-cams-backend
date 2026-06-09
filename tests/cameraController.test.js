@@ -1,8 +1,11 @@
 jest.mock('../config/db', () => ({ query: jest.fn() }));
 jest.mock('../models/cameraModel');
-jest.mock('fs');
+jest.mock('../config/cloudinary', () => ({
+    uploadImage: jest.fn(),
+    deleteImage: jest.fn(),
+}));
 
-const fs = require('fs');
+const { uploadImage, deleteImage } = require('../config/cloudinary');
 const model = require('../models/cameraModel');
 const {
     getCameras,
@@ -62,15 +65,17 @@ describe('getCamera', () => {
 });
 
 describe('addCamera', () => {
-    test('подставляет image_url из загруженного файла и возвращает 201', async () => {
+    test('подставляет image_url из загруженного в Cloudinary файла и возвращает 201', async () => {
+        uploadImage.mockResolvedValueOnce({ secure_url: 'https://res.cloudinary.com/demo/pic.jpg' });
         model.createCamera.mockResolvedValueOnce({ id: 10 });
-        const req = { body: { name: 'Cam' }, file: { filename: 'pic.jpg' } };
+        const req = { body: { name: 'Cam' }, file: { buffer: Buffer.from('img') } };
         const res = makeRes();
 
         await addCamera(req, res);
 
+        expect(uploadImage).toHaveBeenCalledWith(req.file.buffer);
         expect(model.createCamera).toHaveBeenCalledWith(
-            expect.objectContaining({ name: 'Cam', image_url: '/uploads/pic.jpg' })
+            expect.objectContaining({ name: 'Cam', image_url: 'https://res.cloudinary.com/demo/pic.jpg' })
         );
         expect(res.status).toHaveBeenCalledWith(201);
     });
@@ -112,16 +117,16 @@ describe('editCamera', () => {
 });
 
 describe('removeCamera', () => {
-    test('удаляет файл изображения и возвращает 200', async () => {
-        model.getCameraById.mockResolvedValueOnce({ id: 1, image_url: '/uploads/x.jpg' });
+    test('удаляет изображение из Cloudinary и возвращает 200', async () => {
+        const imageUrl = 'https://res.cloudinary.com/demo/x.jpg';
+        model.getCameraById.mockResolvedValueOnce({ id: 1, image_url: imageUrl });
         model.deleteCamera.mockResolvedValueOnce({ id: 1 });
-        fs.existsSync.mockReturnValue(true);
-        fs.unlinkSync.mockReturnValue(undefined);
+        deleteImage.mockResolvedValueOnce(undefined);
         const res = makeRes();
 
         await removeCamera({ params: { id: '1' } }, res);
 
-        expect(fs.unlinkSync).toHaveBeenCalled();
+        expect(deleteImage).toHaveBeenCalledWith(imageUrl);
         expect(model.deleteCamera).toHaveBeenCalledWith('1');
         expect(res.status).toHaveBeenCalledWith(200);
     });
